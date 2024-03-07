@@ -5,36 +5,34 @@ import { useDispatch, useSelector } from 'react-redux';
 import { CreateEvent } from '../redux/EventReducer/action';
 
 export const Eventcreator = ({ onOpens, LetClose }) => {
-    const token = useSelector((store)=>store.AuthReducer.token)
+    const token = useSelector((store) => store.AuthReducer.token)
     const dispatch = useDispatch();
     const [formData, setFormData] = useState({
         name: '',
         venue: '',
         description: '',
         date: '',
-        image: '',
-        token:token
+        image: ''
     });
-
+    const [image, setImage] = useState(null);
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
+        const { type, name, value } = e.target;
+        if (type == "file") {
+            setImage(e.target.files[0])
+        } else {
+            setFormData({...formData,[name]: value});
+        }
     };
 
     const handleSignup = (e) => {
         e.preventDefault()
-        //console.log(formData)
-        dispatch(CreateEvent(formData))
-        setFormData({
-            name: '',
-            venue: '',
-            description: '',
-            date: '',
-            image: ''
-        })
+        const formValue = new FormData();
+        formValue.append('name', formData.name)
+        formValue.append('venue', formData.venue)
+        formValue.append('description', formData.description)
+        formValue.append('date', formData.date)
+        formValue.append('image', image)
+        dispatch(CreateEvent(formValue,token))
         LetClose();
     };
 
@@ -48,13 +46,13 @@ export const Eventcreator = ({ onOpens, LetClose }) => {
                 <ModalCloseButton />
                 <ModalBody>
                     <Input
-                    className='justify-center items-center'
+                        className='justify-center items-center'
                         name="name"
                         placeholder="Name"
                         value={formData.name}
                         onChange={handleChange}
                         marginBottom={4}
-                         fontSize={"16px"}
+                        fontSize={"16px"}
                     />
                     <Input
                         name="venue"
@@ -62,7 +60,7 @@ export const Eventcreator = ({ onOpens, LetClose }) => {
                         value={formData.venue}
                         onChange={handleChange}
                         marginBottom={4}
-                         fontSize={"16px"} className='justify-center  items-center'
+                        fontSize={"16px"} className='justify-center  items-center'
                     />
                     <Input
                         name="description"
@@ -71,13 +69,11 @@ export const Eventcreator = ({ onOpens, LetClose }) => {
                         value={formData.description}
                         onChange={handleChange}
                         marginBottom={4}
-                         fontSize={"16px"} className='justify-center items-center'
+                        fontSize={"16px"} className='justify-center items-center'
                     />
                     <Input
                         name="image"
-                        type="text"
-                        placeholder="Image Link"
-                        value={formData.image}
+                        type="file"
                         onChange={handleChange}
                         marginBottom={4}
                         fontSize={"16px"} className='justify-center  items-center'
@@ -89,7 +85,7 @@ export const Eventcreator = ({ onOpens, LetClose }) => {
                         value={formData.date}
                         onChange={handleChange}
                         marginBottom={4}
-                         fontSize={"16px"} className='justify-center  items-center'
+                        fontSize={"16px"} className='justify-center  items-center'
                     />
 
                 </ModalBody>
